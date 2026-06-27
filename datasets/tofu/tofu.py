@@ -1,7 +1,7 @@
 """Convert TOFU (locuslab/TOFU) QA pairs into EDC-style input passages.
 
-EDC expects datasets/{name}.txt with ONE passage per line.
-Run from the root of the edc repo so the default --out path lands in ./datasets/.
+EDC expects {name}.txt with ONE passage per line.
+Run from the root of the edc repo so the default --out path lands in ./.
 
 Examples:
     python tofu.py --config forget10 --mode qa
@@ -86,7 +86,7 @@ def main():
             else:  # qa
                 lines.append(f"{clean(ex['question'])} {clean(ex['answer'])}")
 
-    out = args.out or f"./datasets/tofu_{args.config}_{args.mode}.txt"
+    out = args.out or f"./tofu_{args.config}_{args.mode}.txt"
     os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
     with open(out, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))

@@ -49,8 +49,17 @@ class SchemaDefiner:
             completion = llm_utils.openai_chat_completion(self.openai_model, None, messages)
             
         relation_definition_dict = llm_utils.parse_relation_definition(completion)
-        
+
         missing_relations = [rel for rel in relations_present if rel not in relation_definition_dict]
         if len(missing_relations) != 0:
-            logger.debug(f"Relations {missing_relations} are missing from the relation definition!")
+            logger.warning(
+                f"Relations {missing_relations} are missing from the relation definition! "
+                f"Falling back to using the relation name itself as its definition."
+            )
+            # Backfill so the returned dict always covers every relation present in the triplets.
+            # Downstream canonicalization looks up definitions by the exact relation string, so a
+            # missing key otherwise raises a KeyError (enrich=True) or silently drops the triplet
+            # (enrich=False).
+            for rel in missing_relations:
+                relation_definition_dict[rel] = rel
         return relation_definition_dict
